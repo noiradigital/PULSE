@@ -208,7 +208,7 @@ async function sendMagicLink() {
     email,
     options: {
       shouldCreateUser: true,
-      emailRedirectTo: REDIRECT_URL  // Supabase redirige ici après le clic
+      emailRedirectTo: REDIRECT_URL
     }
   });
 
@@ -217,9 +217,16 @@ async function sendMagicLink() {
   btn.textContent = 'Recevoir le lien';
 
   if (error) {
-    err.textContent = 'Erreur lors de l\'envoi — réessaie ou contacte Noïra.';
+    // Rate limit : Supabase bloque si même email envoyé < 60s
+    const msg = error.message || '';
+    if (error.status === 429 || msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('limit')) {
+      err.textContent = 'Trop de tentatives — attends 1 minute et réessaie.';
+    } else {
+      // Affiche le vrai message Supabase pour diagnostiquer
+      err.textContent = msg || 'Erreur inconnue — réessaie ou contacte Noïra.';
+    }
     input.style.borderColor = '#A86050';
-    setTimeout(() => input.style.borderColor = '#2E2B28', 2000);
+    setTimeout(() => input.style.borderColor = '#2E2B28', 2500);
     return;
   }
 
@@ -246,10 +253,8 @@ async function checkAccess(userEmail) {
   document.getElementById('auth-screen').style.display = 'none';
 }
 
-// onAuthStateChange gère tout :
-// — INITIAL_SESSION  : session existante au chargement de la page
-// — SIGNED_IN        : retour depuis le magic link (hash URL traité)
-// — TOKEN_REFRESHED  : session renouvelée automatiquement
+// 1. onAuthStateChange capte le retour magic link (SIGNED_IN)
+//    et les sessions existantes (INITIAL_SESSION / TOKEN_REFRESHED)
 _sb.auth.onAuthStateChange(async (event, session) => {
   if (session && session.user) {
     if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
@@ -257,6 +262,15 @@ _sb.auth.onAuthStateChange(async (event, session) => {
     }
   }
 });
+
+// 2. Fallback : getSession() pour les cas où onAuthStateChange
+//    ne se déclenche pas (GitHub Pages, navigation directe)
+(async () => {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (session && session.user) {
+    await checkAccess(session.user.email);
+  }
+})();
 </script>
 
 <nav>
