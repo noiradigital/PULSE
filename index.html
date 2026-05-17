@@ -2,7 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#171513">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PULSE — Ton espace</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -27,6 +30,7 @@ body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--te
 .home-header {
   background:var(--dark);
   padding:32px 24px 28px;
+  padding-top: calc(32px + env(safe-area-inset-top, 0px));
   text-align:center;
 }
 .home-logo { font-family:'Cormorant Garamond',serif;font-style:italic;font-size:48px;line-height:1;color:var(--neon);text-shadow:0 0 20px var(--neon-glow),0 0 55px rgba(237,232,223,0.22);margin-bottom:4px; }
@@ -40,6 +44,8 @@ body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--te
 .link-btn.secondary { background:transparent;color:var(--deep); }
 .link-btn .icon { font-size:16px; }
 
+.pulse-note { background:var(--dark);color:var(--accent);border-radius:10px;padding:13px 16px;font-size:12px;line-height:1.6;margin-bottom:18px; }
+.pulse-note strong { color:var(--neon); }
 .section-label { font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:14px; }
 
 /* ── CARDS GRID ── */
@@ -60,7 +66,7 @@ body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--te
 .module-view { display:none;position:fixed;inset:0;background:var(--bg);z-index:50;overflow-y:auto;overscroll-behavior:none; }
 .module-view.open { display:block; }
 
-.mod-back { position:sticky;top:0;z-index:10;background:var(--dark);padding:13px 20px;display:flex;align-items:center;gap:14px; }
+.mod-back { position:sticky;top:0;z-index:10;background:var(--dark);padding:13px 20px;padding-top:calc(13px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:14px; }
 .mod-back-btn { background:none;border:none;color:var(--accent);font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;padding:0;line-height:1; }
 .mod-back-label { font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#56524C; }
 
@@ -131,6 +137,10 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
 .bio-bad { border-left:3px solid #C47A6A;background:#FAF0EE; }
 .bio-good { border-left:3px solid #7AB87A;background:#F0F8F0; }
 
+/* Module reference */
+.module-ref { background:var(--dark);color:var(--accent);border-radius:8px;padding:11px 14px;font-size:12px;line-height:1.6;margin-bottom:10px;margin-top:10px; }
+.module-ref strong { color:var(--neon); }
+
 /* Reset btn */
 .reset-btn { background:none;border:1px solid var(--mid);border-radius:6px;padding:7px 14px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--deep);cursor:pointer;margin-top:16px;transition:all .2s; }
 .reset-btn:hover { border-color:var(--accent);color:var(--accent); }
@@ -164,10 +174,11 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
   </div>
   <div class="home-body">
 
+    <div class="pulse-note">💡 <strong>Suis la formation Code Liberté étape par étape.</strong> PULSE est un espace en plus — mes stratégies perso, mes scripts et mes conseils. Pour le reste, la formation t'explique tout.</div>
+
     <div class="quick-links">
-      <a href="https://t.me/noiradigital" target="_blank" class="link-btn"><span class="icon">✉️</span> Me contacter sur Telegram</a>
-      <a href="https://tally.so/r/VLb8bg" target="_blank" class="link-btn secondary"><span class="icon">📋</span> Questionnaire d'onboarding (à remplir en premier)</a>
-      <a href="https://drive.google.com/drive/folders/1kRFikf4a3InnAN5jnoDN1fKjXOs840BS?usp=share_link" target="_blank" class="link-btn secondary"><span class="icon">📁</span> Dossier Drive — ressources & mises à jour</a>
+      <a href="https://t.me/noiradigital" target="_blank" class="link-btn"><span class="icon">✉️</span> Telegram — je réponds au plus vite. Cherche d'abord dans les modules 🙏</a>
+      <a href="https://drive.google.com/drive/folders/1kRFikf4a3InnAN5jnoDN1fKjXOs840BS?usp=share_link" target="_blank" class="link-btn secondary"><span class="icon">📦</span> Drive Bonus</a>
     </div>
 
     <div class="section-label">Tes modules</div>
@@ -247,14 +258,30 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
       </div>
     </div>
 
+    <!-- Mindset -->
+    <div class="obj-row">
+      <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>🧘 Mindset</span><span class="arrow">▾</span></div>
+      <div class="obj-body">
+        <div class="module-ref">→ Voir les modules <strong>"Mindset à Succès"</strong> et <strong>"Entrepreneur Conscient"</strong> dans Code Liberté. 💡 Plus de ressources mindset arrivent dans le Drive Bonus.</div>
+        <div class="rule key">🔁 <strong>"Mindset à Succès"</strong> est l'un des deux modules Code Liberté à revisionner encore et encore — chaque écoute te donnera quelque chose de nouveau selon où tu en es.</div>
+        <div class="rule key">
+          <strong>Les bases :</strong><br><br>
+          • Tu n'as pas besoin d'être prête à 100% pour commencer. L'action crée la confiance, pas l'inverse.<br><br>
+          • Le rejet fait partie du jeu. Un "non" en DM = une info, pas un échec. Passe au suivant.<br><br>
+          • Compare-toi à toi d'il y a un mois, pas aux gens qui font ça depuis 2 ans.<br><br>
+          • L'argent que tu n'as pas encore gagné n'est pas perdu — il est en chemin si tu restes régulière.<br><br>
+          • Ta première vente va changer ta façon de voir les choses. Elle arrive si tu postes chaque jour et gères tes DMs.
+        </div>
+      </div>
+    </div>
+
     <!-- Légal -->
     <div class="obj-row">
       <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>📋 Légal — avant de vendre</span><span class="arrow">▾</span></div>
       <div class="obj-body">
-        <div class="rule legal">Pour percevoir des commissions légalement, tu dois avoir un statut.<br><strong>France</strong> : auto-entrepreneur sur autoentrepreneur.urssaf.fr<br><strong>Belgique</strong> : déclaration d'indépendant sur economie.fgov.be<br>Ça prend 15 minutes en ligne.</div>
-        <div class="rule warning">⚠ Si tu as 16 ou 17 ans : démarche identique, mais un parent doit cosigner. Sans ça, tu ne peux pas percevoir de paiements légalement.</div>
+        <div class="module-ref">→ Voir le module <strong>"Déclare ton Activité"</strong> dans Code Liberté — tout y est expliqué étape par étape.</div>
         <ul class="checklist">
-          <li onclick="ck(this,'fondations_2')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Je me suis déclaré(e) — auto-entrepreneur FR ou indépendant BE (ou démarche en cours avec accord parental si mineur)</span></li>
+          <li onclick="ck(this,'fondations_2')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai suivi le module et je suis déclaré(e)</span></li>
         </ul>
       </div>
     </div>
@@ -300,9 +327,9 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
     <div class="obj-row">
       <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>🎨 Branding & positionnement</span><span class="arrow">▾</span></div>
       <div class="obj-body">
-        <div class="rule warning">⚠ Ton branding doit être cohérent sur toutes tes publications. Une esthétique claire = mémorisation, confiance, professionnalisme.</div>
+        <div class="module-ref">→ Voir le module <strong>"Crée ton Univers"</strong> dans Code Liberté pour tout ce qui concerne couleurs, polices et identité visuelle.</div>
         <ul class="checklist">
-          <li onclick="ck(this,'fondations_6')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai choisi 2-3 couleurs et 1-2 polices pour mon branding</span></li>
+          <li onclick="ck(this,'fondations_6')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai suivi "Crée ton Univers" et j'ai défini mes couleurs, polices et identité visuelle</span></li>
           <li onclick="ck(this,'fondations_7')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai défini mon ton de voix (direct ? doux ? cash ? inspirant ?)</span></li>
         </ul>
         <div class="divider"></div>
@@ -343,6 +370,7 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
     <div class="obj-row">
       <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>👤 Ton profil</span><span class="arrow">▾</span></div>
       <div class="obj-body">
+        <div class="module-ref">→ Visionne le replay live <strong>"Optimisation profil Instagram"</strong> dans le module <strong>"Replay des Lives"</strong> de Code Liberté. 💡 Les replays de lives sont une mine d'or — ne les néglige pas, il y a énormément de valeur dedans.</div>
         <div class="rule key">
           <strong>Formule bio :</strong> J'aide [ta cible] à [résultat concret] | [méthode / ce que tu proposes] [CTA]<br><br>
           Ex : "J'aide les étudiantes à générer leurs premiers revenus depuis leur téléphone | Formation + suivi perso 👇"
@@ -361,7 +389,7 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
     <div class="obj-row">
       <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>💸 Paiements & commissions</span><span class="arrow">▾</span></div>
       <div class="obj-body">
-        <div class="rule key">Tes commissions arrivent sur Beacons, puis tu les retires vers PayPal Business. Configure les deux avant ta première vente.</div>
+        <div class="module-ref">→ Voir le module <strong>"Ton Système d'Encaissement"</strong> dans Code Liberté — la formation t'explique comment configurer Beacons et PayPal étape par étape.</div>
         <ul class="checklist">
           <li onclick="ck(this,'setup_4')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai créé mon compte Beacons (beacons.ai) — c'est là que mes commissions sont versées</span></li>
           <li onclick="ck(this,'setup_5')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai créé mon compte PayPal Business pour recevoir mes virements depuis Beacons</span></li>
@@ -373,7 +401,7 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
     <div class="obj-row">
       <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>🔗 Lien affilié Code Liberté</span><span class="arrow">▾</span></div>
       <div class="obj-body">
-        <div class="rule">Suis les étapes du module "Affiliation" dans Code Liberté pour générer ton lien. Vérifie tes spams — le mail peut y atterrir.</div>
+        <div class="module-ref">→ Voir le module <strong>"Affiliation Code Liberté"</strong> dans la formation. Vérifie tes spams si tu ne reçois pas le mail.</div>
         <ul class="checklist">
           <li onclick="ck(this,'setup_6')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai suivi le module "Affiliation Code Liberté" et j'ai mon lien affilié actif</span></li>
         </ul>
@@ -449,13 +477,29 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
 
     <!-- Stratégie -->
     <div class="obj-row">
-      <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>📐 Stratégie connexion / conversion</span><span class="arrow">▾</span></div>
+      <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>📐 Mes 3 stratégies — Croissance · Connexion · Conversion</span><span class="arrow">▾</span></div>
       <div class="obj-body">
-        <div class="rule key">
-          <strong>Connexion (60–70%)</strong> — ton histoire, tes apprentissages, ton quotidien, tes valeurs. L'audience te suit parce qu'elle se reconnaît.<br><br>
-          <strong>Conversion (30–40%)</strong> — présentation de l'offre, résultats, preuves, appel à l'action ("envoie-moi un DM", "lien en bio").
+        <div class="rule key" style="margin-top:10px;">Ce sont mes stratégies perso — à appliquer en parallèle de la formation. Chaque pilier a son rôle précis.</div>
+        <div class="obj-row" style="margin-top:10px;">
+          <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>📈 Croissance</span><span class="arrow">▾</span></div>
+          <div class="obj-body">
+            <div class="rule key"><strong>Priorité absolue les premiers jours et premières semaines.</strong><br><br>L'objectif : faire grossir ton compte le plus vite possible pour que ton contenu soit vu. Sans audience, pas de prospects.<br><br>• Ton <strong>compte de veille</strong> est ton outil principal — analyse les reels avec beaucoup de commentaires dans ta niche et reproduis les formats qui marchent<br>• Suis des comptes de ta cible, interagis sur leurs posts (commentaires sincères, pas "🔥🔥")<br>• Publie au moins 1 reel par jour pour nourrir l'algo<br>• Priorité : commentaires reçus > likes > vues — c'est le vrai signal d'une audience ciblée</div>
+            <div class="rule warning">⚠ Reproduire du contenu viral juste pour avoir des vues ne sert à rien. Ce qui compte : parler précisément à ta cible. 1 000 vues de ta cible > 100 000 vues du mauvais public.</div>
+          </div>
         </div>
-        <div class="rule warning">⚠ Ne fais pas que de la conversion → tu passes pour quelqu'un qui ne fait que vendre. Ne fais pas que de la connexion → personne ne sait ce que tu proposes. Les deux ensemble = confiance + ventes.</div>
+        <div class="obj-row">
+          <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>🤝 Connexion</span><span class="arrow">▾</span></div>
+          <div class="obj-body">
+            <div class="rule key"><strong>Ton histoire, tes apprentissages, ton quotidien, tes valeurs.</strong><br><br>Le but : que l'audience te suive parce qu'elle se reconnaît en toi. Tu montres qui tu es — pas ce que tu vends.<br><br>Format principal : <strong>reels</strong><br><br>Exemples : "voilà ce que j'ai appris aujourd'hui", "ma journée dans le digital", "pourquoi j'ai lancé ça", "ce que personne ne te dit sur..."</div>
+          </div>
+        </div>
+        <div class="obj-row">
+          <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>💰 Conversion</span><span class="arrow">▾</span></div>
+          <div class="obj-body">
+            <div class="rule key"><strong>Vendre — et ça se passe surtout en stories.</strong><br><br>Résultats, témoignages, preuves sociales, CTA directs. C'est là que tu parles de ton offre, que tu crées de l'urgence, que tu invites au DM.<br><br>Format principal : <strong>stories quotidiennes</strong><br><br>Exemples : "ma commission du mois", "témoignage d'une cliente", "DM moi 'info' si tu veux comprendre", "il reste X places ce mois-ci"</div>
+            <div class="rule warning">⚠ Ne fais pas que de la conversion en stories → tu passes pour quelqu'un qui ne fait que vendre. Alterne avec des stories connexion (coulisses, apprentissages, polls) pour garder la confiance.</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -463,6 +507,8 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
     <div class="obj-row">
       <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>🎬 Reels</span><span class="arrow">▾</span></div>
       <div class="obj-body">
+        <div class="module-ref">→ Voir les modules <strong>"Machine à Contenu"</strong>, <strong>"Ton Assistant Virtuel ChatGPT"</strong> et <strong>"Ton Image avec l'IA"</strong> dans Code Liberté.</div>
+        <div class="rule warning">⚠ Reproduire du contenu viral juste pour avoir des vues ne sert à rien. Ce qui compte : que le contenu soit <strong>ciblé</strong> — qu'il parle à ta cible précise, pas à tout le monde. 1 000 vues de ta cible valent plus que 100 000 vues du mauvais public.</div>
         <div class="rule key">👁 Ton compte de veille — c'est maintenant qu'il est utile. Consulte les reels enregistrés, identifie les formats avec beaucoup de commentaires, reproduis avec ton angle.</div>
         <ul class="checklist">
           <li onclick="ck(this,'contenu_0')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai créé ma liste de 10 hooks (basés sur la douleur de ma cible dans SES mots)</span></li>
@@ -550,6 +596,7 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
       <div class="progress-bar"><div class="progress-fill" id="bar-in-vente"></div></div>
     </div>
 
+    <div class="module-ref">→ Voir les modules <strong>"Système de Vente"</strong> et <strong>"Vendre Simplement"</strong> dans Code Liberté pour les bases. 🔁 <strong>"Système de Vente"</strong> est l'un des deux modules à revisionner encore et encore — chaque passage affine ta posture. Ci-dessous : mes scripts et ma méthode personnelle.</div>
     <div class="rule key">💡 Tu peux closer en appel ou directement en DM — les deux fonctionnent. L'appel est recommandé pour les prospects chauds. Le DM pour ceux qui préfèrent écrire. Pas une méthode meilleure que l'autre.</div>
 
     <!-- Scripts DM qualification -->
@@ -717,29 +764,9 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
           <p style="margin-top:6px;"><strong>Google Drive</strong> — stockage, partage de ressources avec tes clientes</p>
           <p style="margin-top:6px;"><strong>Telegram</strong> — suivi client, support, groupes</p>
         </div>
-        <div class="card">
-          <div class="card-title">Légal</div>
-          <p><strong>France :</strong> autoentrepreneur.urssaf.fr</p>
-          <p style="margin-top:4px;"><strong>Belgique :</strong> economie.fgov.be / guichet-entreprises.be</p>
-          <p style="margin-top:4px;"><strong>16-17 ans :</strong> accord parental obligatoire — démarche identique avec cosignature.</p>
-        </div>
       </div>
     </div>
 
-    <!-- FAQ -->
-    <div class="obj-row">
-      <div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>❓ FAQ</span><span class="arrow">▾</span></div>
-      <div class="obj-body">
-        <div class="rule key" style="margin-top:12px;">Ta question n'est pas là ? <a href="https://t.me/noiradigital" target="_blank" style="color:var(--accent);font-weight:600;">Telegram</a> — je réponds en direct.</div>
-        <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Combien de temps avant ma première vente ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:10px;font-size:12px;line-height:1.6;">Ça dépend de ta régularité. L'objectif : ta première vente le plus vite possible après le démarrage. C'est réaliste si tu postes chaque jour et gères tes DMs sérieusement.</p></div></div>
-        <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Je dois montrer mon visage ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:10px;font-size:12px;line-height:1.6;">Non. B-roll + texte overlay, voix off, ou uniquement en DM — tout fonctionne. Dans la formation Code Liberté, le module <strong>"Vendre en faceless"</strong> t'explique tout en détail.</p></div></div>
-        <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Tout depuis mon téléphone ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:10px;font-size:12px;line-height:1.6;">Oui. Reels, DMs, appels, page de vente — tout se gère depuis un smartphone. Pas besoin d'ordi pour démarrer.</p></div></div>
-        <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Comment fonctionne le paiement de ma commission ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:10px;font-size:12px;line-height:1.6;">Ta commission est versée sur ton compte <strong>Beacons</strong>. Depuis Beacons, tu retires vers <strong>PayPal Business</strong>. Délai : <strong>5 jours ouvrés</strong> après encaissement complet (si 3× : après le dernier paiement).</p><p style="font-size:12px;margin-top:8px;">Problème ? Email : <strong>support@codeliberte.com</strong> — objet "Problème de commission" — fournis : nom, date de vente, email du client, type de paiement, ton RIB.</p></div></div>
-        <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Est-ce que je dois me déclarer avant de vendre ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:10px;font-size:12px;line-height:1.6;">Oui — pour percevoir des commissions légalement tu dois avoir un statut. France : auto-entrepreneur. Belgique : indépendant. 16-17 ans : accord parental obligatoire.</p></div></div>
-        <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>J'ai rien vendu en ligne avant — c'est pour moi ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:10px;font-size:12px;line-height:1.6;">C'est exactement pour toi. Ceux qui partent de zéro n'ont pas de mauvaises habitudes à défaire. Tu as un plan, un accompagnement, et l'envie que ça change. Le reste se construit.</p></div></div>
-        <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Jusqu'à quand suis-je accompagné(e) ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:10px;font-size:12px;line-height:1.6;">Jusqu'à ta première vente. Telegram est disponible pour tout ce qui bloque — mais il ne remplace pas ton passage à l'action.</p></div></div>
-      </div>
-    </div>
 
   </div>
 </div>
