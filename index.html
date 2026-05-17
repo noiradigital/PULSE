@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
 <meta name="theme-color" content="#171513">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,7 +19,7 @@
 }
 * { box-sizing:border-box; margin:0; padding:0; }
 html { background:var(--dark); overscroll-behavior:none; }
-body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; font-size:13.5px; line-height:1.6; overscroll-behavior:none; overflow-x:hidden; }
+body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; font-size:13.5px; line-height:1.6; overscroll-behavior:none; overflow-x:hidden; touch-action:pan-y; -webkit-text-size-adjust:100%; }
 
 /* ── AUTH ── */
 #auth-screen { position:fixed;inset:0;background:#171513;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:40px 24px;text-align:center; }
@@ -164,6 +164,29 @@ h3 { font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercas
   <button onclick="checkPw()"
     style="background:#EDE8DF;color:#171513;border:none;border-radius:8px;padding:14px 0;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;width:100%;max-width:320px;"
     onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Accéder</button>
+
+  <!-- Tuto écran d'accueil -->
+  <div style="margin-top:36px;width:100%;max-width:320px;">
+    <div style="font-size:9px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#56524C;margin-bottom:12px;text-align:center;">Ajouter sur ton écran d'accueil</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <button id="btn-ios" onclick="switchOs('ios')"
+        style="flex:1;background:#2A2724;border:1.5px solid #3A3632;border-radius:8px;padding:9px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;color:#EDE8DF;cursor:pointer;">🍎 iPhone</button>
+      <button id="btn-android" onclick="switchOs('android')"
+        style="flex:1;background:transparent;border:1.5px solid #2A2724;border-radius:8px;padding:9px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;color:#56524C;cursor:pointer;">🤖 Android</button>
+    </div>
+    <div id="tuto-ios" style="background:#1F1C1A;border-radius:10px;padding:14px 16px;font-size:11px;color:#948F89;line-height:1.9;">
+      1. Ouvre ce lien dans <strong style="color:#EDE8DF;">Safari</strong><br>
+      2. Appuie sur <strong style="color:#EDE8DF;">l'icône partage</strong> (carré avec flèche ↑)<br>
+      3. Fais défiler → <strong style="color:#EDE8DF;">"Sur l'écran d'accueil"</strong><br>
+      4. Appuie sur <strong style="color:#EDE8DF;">Ajouter</strong> — c'est bon ✓
+    </div>
+    <div id="tuto-android" style="display:none;background:#1F1C1A;border-radius:10px;padding:14px 16px;font-size:11px;color:#948F89;line-height:1.9;">
+      1. Ouvre ce lien dans <strong style="color:#EDE8DF;">Chrome</strong><br>
+      2. Appuie sur les <strong style="color:#EDE8DF;">3 points</strong> en haut à droite<br>
+      3. Sélectionne <strong style="color:#EDE8DF;">"Ajouter à l'écran d'accueil"</strong><br>
+      4. Appuie sur <strong style="color:#EDE8DF;">Ajouter</strong> — c'est bon ✓
+    </div>
+  </div>
 </div>
 
 <!-- ══ HOME ══ -->
@@ -889,6 +912,23 @@ function copyPrompt(btn) {
 }
 
 window.addEventListener('load', loadChecks);
+
+// ══════════════════════════════════
+// TUTO ÉCRAN D'ACCUEIL
+// ══════════════════════════════════
+function switchOs(os) {
+  const isIos = os === 'ios';
+  document.getElementById('tuto-ios').style.display = isIos ? 'block' : 'none';
+  document.getElementById('tuto-android').style.display = isIos ? 'none' : 'block';
+  const btnIos = document.getElementById('btn-ios');
+  const btnAndroid = document.getElementById('btn-android');
+  btnIos.style.background = isIos ? '#2A2724' : 'transparent';
+  btnIos.style.borderColor = isIos ? '#3A3632' : '#2A2724';
+  btnIos.style.color = isIos ? '#EDE8DF' : '#56524C';
+  btnAndroid.style.background = isIos ? 'transparent' : '#2A2724';
+  btnAndroid.style.borderColor = isIos ? '#2A2724' : '#3A3632';
+  btnAndroid.style.color = isIos ? '#56524C' : '#EDE8DF';
+}
 </script>
 </body>
 </html>
