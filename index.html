@@ -176,7 +176,15 @@ p { margin-bottom:10px; }
 // ══════════════════════════════════════════════════
 const SUPABASE_URL = 'https://magdeylvybemfqaabfgg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_N3oKgF4aExkg8mod8T-8_Q_LA8GNWpm';
-const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const REDIRECT_URL = 'https://noiradigital.github.io/PULSE/';
+
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    detectSessionInUrl: true,   // lit le hash #access_token= au retour magic link
+    persistSession: true,        // garde la session entre les visites
+    autoRefreshToken: true
+  }
+});
 
 async function sendMagicLink() {
   const input = document.getElementById('email-input');
@@ -198,7 +206,10 @@ async function sendMagicLink() {
 
   const { error } = await _sb.auth.signInWithOtp({
     email,
-    options: { shouldCreateUser: true }
+    options: {
+      shouldCreateUser: true,
+      emailRedirectTo: REDIRECT_URL  // Supabase redirige ici après le clic
+    }
   });
 
   btn.disabled = false;
@@ -206,13 +217,12 @@ async function sendMagicLink() {
   btn.textContent = 'Recevoir le lien';
 
   if (error) {
-    err.textContent = 'Email non reconnu — contacte Noïra pour obtenir ton accès.';
+    err.textContent = 'Erreur lors de l\'envoi — réessaie ou contacte Noïra.';
     input.style.borderColor = '#A86050';
     setTimeout(() => input.style.borderColor = '#2E2B28', 2000);
     return;
   }
 
-  // Masquer le form, afficher l'état "envoyé"
   document.getElementById('auth-form').style.display = 'none';
   document.getElementById('auth-sent').style.display = 'flex';
 }
@@ -236,20 +246,17 @@ async function checkAccess(userEmail) {
   document.getElementById('auth-screen').style.display = 'none';
 }
 
-// Écoute les changements d'état (retour depuis le magic link)
+// onAuthStateChange gère tout :
+// — INITIAL_SESSION  : session existante au chargement de la page
+// — SIGNED_IN        : retour depuis le magic link (hash URL traité)
+// — TOKEN_REFRESHED  : session renouvelée automatiquement
 _sb.auth.onAuthStateChange(async (event, session) => {
   if (session && session.user) {
-    await checkAccess(session.user.email);
+    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
+      await checkAccess(session.user.email);
+    }
   }
 });
-
-// Vérifie si une session active existe déjà au chargement
-(async function() {
-  const { data: { session } } = await _sb.auth.getSession();
-  if (session && session.user) {
-    await checkAccess(session.user.email);
-  }
-})();
 </script>
 
 <nav>
