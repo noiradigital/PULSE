@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULSE — Ton espace</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#EBEBEA; --bg2:#E1DEDB;
+  --mid:#C0BCB8; --accent:#948F89;
+  --deep:#646058; --text:#1C1A18;
+  --white:#F3F1EF;
+  --dark:#171513;
+  --neon:#EDE8DF; --neon-glow:rgba(237,232,223,0.6);
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html { background:var(--dark); overscroll-behavior:none; }
+body { font-family:'Montserrat',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; font-size:13.5px; line-height:1.6; overscroll-behavior:none; overflow-x:hidden; }
+
+/* NAV */
+nav { background:var(--dark); display:flex; overflow-x:auto; scrollbar-width:none; position:sticky; top:0; z-index:99; }
+nav::-webkit-scrollbar { display:none; }
+nav button { flex-shrink:0; background:none; border:none; border-bottom:3px solid transparent; padding:13px 15px; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:500; letter-spacing:.09em; text-transform:uppercase; color:#56524C; cursor:pointer; transition:all .2s; white-space:nowrap; }
+nav button.active { border-bottom-color:var(--neon); color:var(--neon); font-weight:600; text-shadow:0 0 14px var(--neon-glow), 0 0 32px rgba(237,232,223,0.25); }
+nav button:hover:not(.active) { color:#9A958F; }
+
+/* SECTIONS */
+.section { display:none; padding:0 20px 80px; max-width:680px; margin:0 auto; }
+.section.active { display:block; }
+
+/* ── BANDE TITRE SOMBRE — le néon s'allume sur fond noir ── */
+.week-badge {
+  display:block;
+  margin:0 -20px;
+  padding:26px 24px 0;
+  background:var(--dark);
+  font-size:9.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--accent);
+}
+.section-title {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:44px; letter-spacing:.025em; line-height:1.05;
+  margin:0 -20px;
+  padding:4px 24px 28px;
+  background:var(--dark);
+  color:var(--neon);
+  text-shadow:
+    0 0 20px var(--neon-glow),
+    0 0 55px rgba(237,232,223,0.28),
+    0 0 110px rgba(237,232,223,0.1);
+}
+.section > .section-title:first-child { padding-top:28px; }
+
+.section-sub {
+  font-size:10px; font-weight:500; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent); margin:20px 0 20px;
+}
+
+h3 { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--deep); margin:22px 0 10px; }
+p { margin-bottom:10px; }
+
+/* PROGRESS */
+.progress-wrap { margin-bottom:14px; }
+.progress-label { display:flex; justify-content:space-between; font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--deep); margin-bottom:5px; }
+.progress-bar { background:var(--mid); border-radius:20px; height:5px; overflow:hidden; }
+.progress-fill { background:var(--accent); height:100%; border-radius:20px; transition:width .4s ease; }
+
+/* CHECKLIST */
+.checklist { list-style:none; display:flex; flex-direction:column; gap:2px; margin-bottom:12px; }
+.checklist li { display:flex; align-items:flex-start; gap:12px; padding:10px 14px; background:var(--white); border:1px solid var(--mid); border-radius:8px; cursor:pointer; transition:all .15s; user-select:none; }
+.checklist li:hover { border-color:var(--accent); }
+.checklist li.done { background:var(--bg2); opacity:.7; }
+.checklist li.done .item-text { text-decoration:line-through; color:var(--accent); }
+.check-box { width:20px; height:20px; border:2px solid var(--mid); border-radius:5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .15s; margin-top:1px; }
+.checklist li.done .check-box { background:var(--accent); border-color:var(--accent); }
+.item-text { font-size:13px; line-height:1.45; }
+
+/* SCRIPT */
+.script { background:var(--white); border:1px solid var(--mid); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:12px 14px; margin-bottom:8px; font-style:italic; font-size:13px; line-height:1.55; color:var(--text); }
+.script .label { font-style:normal; font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:5px; display:block; }
+.script .note { font-style:normal; font-size:10.5px; color:var(--deep); margin-top:6px; padding-top:6px; border-top:1px solid var(--mid); font-weight:500; }
+.script .go { color:#587A50; font-weight:600; font-style:normal; font-size:10px; display:block; margin-top:4px; }
+.script .stop { color:#9A5A48; font-weight:600; font-style:normal; font-size:10px; display:block; margin-top:2px; }
+
+/* RULES */
+.rule { background:var(--bg2); border-left:3px solid var(--deep); border-radius:0 8px 8px 0; padding:10px 14px; font-size:12px; font-weight:500; color:var(--deep); margin-bottom:10px; line-height:1.5; }
+.rule.warning { border-left-color:#A88050; background:#F5EEE5; color:#7A5E3A; }
+.rule.key { border-left-color:var(--accent); background:var(--bg); color:var(--text); }
+.rule.legal { border-left-color:#6A8A70; background:#EEF2EE; color:#487058; }
+
+/* ACCORDION */
+.obj-row { border:1px solid var(--mid); border-radius:8px; overflow:hidden; margin-bottom:6px; background:var(--white); }
+.obj-trigger { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; cursor:pointer; font-size:13px; font-weight:500; gap:10px; user-select:none; }
+.obj-trigger .arrow { font-size:12px; color:var(--mid); transition:transform .2s; flex-shrink:0; }
+.obj-row.open .arrow { transform:rotate(180deg); }
+.obj-body { display:none; padding:0 14px 14px; border-top:1px solid var(--mid); }
+.obj-row.open .obj-body { display:block; }
+.obj-body .script { margin-top:12px; margin-bottom:0; }
+
+/* CARDS */
+.card { background:var(--white); border:1px solid var(--mid); border-radius:10px; padding:18px; margin-bottom:14px; }
+.card-title { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:20px; margin-bottom:8px; color:var(--text); }
+
+/* LINK BUTTONS */
+.link-btn { display:flex; align-items:center; gap:10px; background:var(--dark); color:var(--neon); border:none; border-radius:8px; padding:14px 18px; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:opacity .2s; width:100%; margin-bottom:10px; }
+.link-btn:hover { opacity:.8; }
+.link-btn.secondary { background:none; border:1.5px solid var(--mid); color:var(--deep); }
+.link-btn .icon { font-size:16px; }
+
+/* PROMPT BOX */
+.prompt-box { background:var(--white); border:1px solid var(--mid); border-radius:8px; padding:14px; margin-bottom:10px; position:relative; }
+.prompt-box .prompt-label { font-size:9px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; display:block; }
+.prompt-box p { font-size:12px; color:var(--text); margin:0; line-height:1.55; font-family:monospace; white-space:pre-wrap; word-break:break-word; }
+.copy-btn { position:absolute; top:10px; right:10px; background:var(--accent); color:var(--white); border:none; border-radius:4px; padding:4px 10px; font-family:'Montserrat',sans-serif; font-size:9px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; }
+.copy-btn:hover { opacity:.8; }
+
+/* FORK */
+.fork { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.fork-card { border:1.5px solid var(--mid); border-radius:10px; padding:14px; cursor:pointer; transition:all .2s; text-align:center; background:var(--white); }
+.fork-card:hover,.fork-card.selected { border-color:var(--accent); background:var(--bg2); }
+.fork-card .fork-icon { font-size:22px; margin-bottom:6px; }
+.fork-card .fork-title { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text); margin-bottom:4px; }
+.fork-card .fork-desc { font-size:11px; color:var(--deep); }
+.fork-content { display:none; }
+.fork-content.active { display:block; }
+
+/* MISC */
+.divider { border:none; border-top:1px solid var(--mid); margin:18px 0; }
+.reset-btn { background:none; border:1px solid var(--mid); border-radius:6px; padding:6px 14px; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:var(--deep); cursor:pointer; transition:all .2s; }
+.reset-btn:hover { border-color:var(--accent); color:var(--accent); }
+.tag { display:inline-block; background:var(--bg2); color:var(--deep); border-radius:4px; padding:2px 8px; font-size:9.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+.two-col .mini-card { background:var(--white); border:1px solid var(--mid); border-radius:8px; padding:12px; font-size:12px; line-height:1.45; }
+.mini-card .mc-title { font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+.bio-bad { border-left:3px solid #C47A6A; background:#FAF0EE; }
+.bio-good { border-left:3px solid #7AB87A; background:#F0F8F0; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- ══ ÉCRAN D'ACCÈS ══ -->
+<div id="auth-screen" style="position:fixed;inset:0;background:#171513;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:40px 24px;text-align:center;">
+  <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:56px;line-height:1;color:#EDE8DF;text-shadow:0 0 22px rgba(237,232,223,0.6),0 0 60px rgba(237,232,223,0.22);margin-bottom:6px;">PULSE.</div>
+  <div style="font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#948F89;margin-bottom:48px;">Espace client · Accès privé</div>
+
+  <!-- Formulaire email -->
+  <div id="auth-form" style="display:flex;flex-direction:column;align-items:center;width:100%;">
+    <input id="email-input" type="email" placeholder="Ton email" autocomplete="email"
+      style="background:#1F1C1A;border:1.5px solid #2E2B28;border-radius:8px;padding:14px 20px;font-family:'Montserrat',sans-serif;font-size:13px;color:#EDE8DF;width:100%;max-width:320px;outline:none;text-align:center;margin-bottom:10px;-webkit-appearance:none;"
+      onkeydown="if(event.key==='Enter')sendMagicLink()"
+      onfocus="this.style.borderColor='#948F89'" onblur="this.style.borderColor='#2E2B28'">
+    <div id="auth-error" style="font-size:11px;color:#A86050;letter-spacing:.06em;min-height:18px;margin-bottom:10px;"></div>
+    <button id="auth-btn" onclick="sendMagicLink()"
+      style="background:#EDE8DF;color:#171513;border:none;border-radius:8px;padding:14px 0;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;width:100%;max-width:320px;transition:opacity .2s;"
+      onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Recevoir le lien</button>
+  </div>
+
+  <!-- État après envoi -->
+  <div id="auth-sent" style="display:none;flex-direction:column;align-items:center;">
+    <div style="font-size:36px;margin-bottom:20px;">✉️</div>
+    <div style="font-size:14px;color:#EDE8DF;margin-bottom:12px;line-height:1.5;font-weight:500;">Lien envoyé — vérifie tes emails.</div>
+    <div style="font-size:11px;color:#646058;line-height:1.7;max-width:280px;">Clique sur le lien reçu par email pour accéder à ton espace PULSE.<br>Si tu ne le vois pas dans 2 min, vérifie tes spams.</div>
+    <button onclick="document.getElementById('auth-sent').style.display='none';document.getElementById('auth-form').style.display='flex';"
+      style="margin-top:28px;background:none;border:1px solid #2E2B28;border-radius:6px;padding:8px 18px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#646058;cursor:pointer;">← Changer d'email</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// AUTH SUPABASE — Magic Link
+// Pour ajouter une cliente : insère son email dans
+// la table "pulse_whitelist" sur Supabase (active = true)
+// Pour révoquer : passe active = false ou supprime la ligne.
+// ══════════════════════════════════════════════════
+const SUPABASE_URL = 'https://magdeylvybemfqaabfgg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_N3oKgF4aExkg8mod8T-8_Q_LA8GNWpm';
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function sendMagicLink() {
+  const input = document.getElementById('email-input');
+  const email = input.value.trim().toLowerCase();
+  const err = document.getElementById('auth-error');
+  const btn = document.getElementById('auth-btn');
+
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    err.textContent = 'Entre un email valide.';
+    input.style.borderColor = '#A86050';
+    setTimeout(() => input.style.borderColor = '#2E2B28', 1500);
+    return;
+  }
+
+  err.textContent = '';
+  btn.disabled = true;
+  btn.style.opacity = '.5';
+  btn.textContent = 'Envoi en cours…';
+
+  const { error } = await _sb.auth.signInWithOtp({
+    email,
+    options: { shouldCreateUser: false }
+  });
+
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  btn.textContent = 'Recevoir le lien';
+
+  if (error) {
+    err.textContent = 'Email non reconnu — contacte Noïra pour obtenir ton accès.';
+    input.style.borderColor = '#A86050';
+    setTimeout(() => input.style.borderColor = '#2E2B28', 2000);
+    return;
+  }
+
+  // Masquer le form, afficher l'état "envoyé"
+  document.getElementById('auth-form').style.display = 'none';
+  document.getElementById('auth-sent').style.display = 'flex';
+}
+
+async function checkAccess(userEmail) {
+  const { data, error } = await _sb
+    .from('pulse_whitelist')
+    .select('active')
+    .eq('email', userEmail.toLowerCase())
+    .single();
+
+  if (error || !data || !data.active) {
+    await _sb.auth.signOut();
+    document.getElementById('auth-error').textContent = 'Accès non autorisé — contacte Noïra.';
+    document.getElementById('auth-sent').style.display = 'none';
+    document.getElementById('auth-form').style.display = 'flex';
+    return;
+  }
+
+  // Accès accordé
+  document.getElementById('auth-screen').style.display = 'none';
+}
+
+// Écoute les changements d'état (retour depuis le magic link)
+_sb.auth.onAuthStateChange(async (event, session) => {
+  if (session && session.user) {
+    await checkAccess(session.user.email);
+  }
+});
+
+// Vérifie si une session active existe déjà au chargement
+(async function() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (session && session.user) {
+    await checkAccess(session.user.email);
+  }
+})();
+</script>
+
+<nav>
+  <button class="active" onclick="show('accueil',this)">Accueil</button>
+  <button onclick="show('s1',this)">Sem. 1</button>
+  <button onclick="show('s2',this)">Sem. 2</button>
+  <button onclick="show('s3',this)">Sem. 3</button>
+  <button onclick="show('s4',this)">Sem. 4</button>
+  <button onclick="show('dm',this)">Scripts DM</button>
+  <button onclick="show('closing',this)">Closing</button>
+  <button onclick="show('objections',this)">Objections</button>
+  <button onclick="show('prompts',this)">Prompts IA</button>
+  <button onclick="show('ressources',this)">Ressources</button>
+  <button onclick="show('faq',this)">FAQ</button>
+</nav>
+
+<!-- ══ ACCUEIL ══ -->
+<section class="section active" id="accueil">
+  <div class="section-title">PULSE.</div>
+  <div class="section-sub">Ton espace · 4 semaines</div>
+
+  <div class="card">
+    <p>Tout ce dont tu as besoin est ici : plan étape par étape, scripts exacts, prompts IA, ressources. Pour tout ce qui sort du cadre — Telegram.</p>
+  </div>
+
+  <h3>Tes liens essentiels</h3>
+  <a href="https://t.me/noiradigital" target="_blank" class="link-btn"><span class="icon">✉️</span> Me contacter sur Telegram</a>
+  <a href="https://tally.so/r/VLb8bg" target="_blank" class="link-btn secondary"><span class="icon">📋</span> Questionnaire d'onboarding (à remplir en premier)</a>
+  <a href="https://drive.google.com/drive/folders/1kRFikf4a3InnAN5jnoDN1fKjXOs840BS?usp=share_link" target="_blank" class="link-btn secondary"><span class="icon">📁</span> Dossier Drive — ressources & mises à jour</a>
+
+  <div class="divider"></div>
+  <h3>Ta progression</h3>
+  <div class="progress-wrap"><div class="progress-label"><span>Semaine 1 — Fondations</span><span id="p1-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="p1-bar" style="width:0%"></div></div></div>
+  <div class="progress-wrap"><div class="progress-label"><span>Semaine 2 — Business</span><span id="p2-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="p2-bar" style="width:0%"></div></div></div>
+  <div class="progress-wrap"><div class="progress-label"><span>Semaine 3 — Contenu</span><span id="p3-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="p3-bar" style="width:0%"></div></div></div>
+  <div class="progress-wrap"><div class="progress-label"><span>Semaine 4 — Closing</span><span id="p4-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="p4-bar" style="width:0%"></div></div></div>
+</section>
+
+<!-- ══ SEMAINE 1 — FONDATIONS ══ -->
+<section class="section" id="s1">
+  <div class="week-badge">Semaine 1 · J1–J7</div>
+  <div class="section-title">Fondations</div>
+  <div class="section-sub">Poser les bases avant tout le reste</div>
+
+  <div class="progress-wrap"><div class="progress-label"><span>Progression</span><span id="p1b-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="p1b-bar" style="width:0%"></div></div></div>
+
+  <h3>Formation</h3>
+  <ul class="checklist">
+    <li onclick="ck(this,'1_0')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai accédé à la formation Code Liberté et regardé les modules de base</span></li>
+    <li onclick="ck(this,'1_1')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai rempli le questionnaire d'onboarding Tally</span></li>
+  </ul>
+
+  <h3>Légal — à faire avant de vendre</h3>
+  <div class="rule legal">📋 Pour percevoir des commissions légalement, tu dois avoir un statut. En France : auto-entrepreneur (URSSAF.fr). En Belgique : déclaration d'activité indépendante (crossroadsbankforenterprises.be). Ça prend 15 minutes en ligne.</div>
+  <div class="rule warning">⚠ Si tu as 16 ou 17 ans : tu peux te lancer, mais tu as besoin d'une autorisation parentale pour te déclarer. Un parent doit cosigner. Sans ça, tu ne peux pas percevoir de paiements légalement.</div>
+  <ul class="checklist">
+    <li onclick="ck(this,'1_2')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">✅ Je me suis déclaré(e) (auto-entrepreneur FR ou indépendant BE) — ou j'ai démarché la démarche avec accord parental si mineur</span></li>
+  </ul>
+
+  <h3>Compte & profil</h3>
+  <ul class="checklist">
+    <li onclick="ck(this,'1_3')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Mon compte est en mode créateur (Instagram ou TikTok)</span></li>
+    <li onclick="ck(this,'1_4')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Ma bio est rédigée selon la formule ci-dessous (positive, pas de vie difficile)</span></li>
+    <li onclick="ck(this,'1_5')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Ma photo de profil est claire, professionnelle, lumineuse</span></li>
+    <li onclick="ck(this,'1_6')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai choisi ma niche et j'ai une idée claire de qui je veux aider</span></li>
+    <li onclick="ck(this,'1_12')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Mon nom de compte est simple et clair : prénom + "digit", "digital" ou similaire (ex : @marie.digital, @chloe_digit). Court, mémorisable, professionnel. Ma photo de profil montre bien mon visage.</span></li>
+  </ul>
+
+  <div class="divider"></div>
+  <h3>✍️ Ta bio — la règle la plus importante</h3>
+  <div class="rule warning">⚠ L'erreur que font presque tous les revendeurs : parler de leur galère dans leur bio ("j'étais fauchée, sans argent..."). Ta bio est ta vitrine — elle doit mettre en valeur ce que tu apportes et à qui, pas d'où tu viens. Ton histoire personnelle = dans tes reels, pour la connexion. Ta bio = autorité et valeur.</div>
+
+  <div class="two-col">
+    <div class="mini-card bio-bad">
+      <div class="mc-title">❌ À éviter</div>
+      "J'étais étudiante sans argent, j'ai galéré pendant des mois, aujourd'hui je suis libre financièrement 🙏"
+    </div>
+    <div class="mini-card bio-good">
+      <div class="mc-title">✅ Ce qui fonctionne</div>
+      "J'aide les jeunes femmes à générer leurs premiers revenus en ligne | Formation + accompagnement perso 👇"
+    </div>
+  </div>
+
+  <div class="rule key">
+    <strong>Formule bio :</strong> J'aide [ta cible] à [résultat concret] | [méthode / ce que tu proposes] [CTA ou lien]<br><br>
+    Exemples :<br>
+    • "J'aide les étudiantes à générer leurs premiers revenus depuis leur téléphone | Formation + suivi perso 👇"<br>
+    • "Marketing digital pour jeunes femmes qui veulent leur propre argent | Formation en ligne 👇"<br>
+    • "Tu veux vendre en ligne sans te montrer ? Je t'explique comment. 👇"
+  </div>
+
+  <h3>Paiements & commission</h3>
+  <div class="rule key">Tes commissions arrivent sur Beacons, puis tu les retires vers ton compte PayPal Business. Les deux doivent être configurés avant ta première vente pour pouvoir être payé(e) dès que ça arrive.</div>
+  <ul class="checklist">
+    <li onclick="ck(this,'1_13')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai créé mon compte Beacons (beacons.ai) — c'est là que mes commissions Code Liberté sont versées</span></li>
+    <li onclick="ck(this,'1_14')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai créé mon compte PayPal Business pour recevoir mes virements depuis Beacons</span></li>
+  </ul>
+
+  <h3>Lien affilié — Code Liberté</h3>
+  <div class="rule">Suis les étapes du module "Affiliation" dans Code Liberté pour générer ton lien. Vérifie bien tes spams — le mail peut y atterrir.</div>
+  <ul class="checklist">
+    <li onclick="ck(this,'1_15')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai suivi le module "Affiliation Code Liberté" et j'ai mon lien affilié actif</span></li>
+  </ul>
+
+  <div class="card">
+    <div class="card-title">Support Code Liberté</div>
+    <p style="font-size:11px;color:var(--deep);margin-bottom:10px;">Si un problème survient, contacte le support par email avec l'objet exact ci-dessous :</p>
+    <div class="script" style="margin-bottom:8px;"><span class="label">Lien affilié non reçu</span>Email : <strong>support@codeliberte.com</strong> — Objet : "Problème lien d'affiliation"<br>Fournis l'adresse email utilisée pour ton inscription.</div>
+    <div class="script" style="margin-bottom:8px;"><span class="label">Commission non reçue</span>Email : <strong>support@codeliberte.com</strong> — Objet : "Problème de commission"<br>Fournis : nom/prénom · date de la vente · email du client · paiement 1× ou échelonné · ton RIB.<br><span class="note" style="margin:0;">Délai : 5 jours ouvrés après encaissement complet.</span></div>
+    <div class="script" style="margin-bottom:0;"><span class="label">Guide de bienvenue client non reçu</span>Email : <strong>support@codeliberte.com</strong> — Objet : "Problème guide de bienvenue"<br>Fournis : nom du client · email du client · date de la vente.</div>
+  </div>
+
+  <h3>Compte de veille — stratégie croissance</h3>
+  <div class="rule key">
+    <strong>Pourquoi créer un compte de veille dès la Semaine 1 ?</strong><br><br>
+    Le but n'est pas d'avoir des abonnés sur ce compte — c'est de <strong>collecter des reels qui marchent</strong> dans ta niche pour les reproduire sur ton compte principal. Tu grossis d'abord. Tu convertis ensuite.<br><br>
+    <strong>Comment ça marche :</strong><br>
+    1. Crée un nouveau compte Instagram (ou TikTok) — séparé, anonyme<br>
+    2. Sur ce compte, tu ne postes <em>rien</em>. Tu fais une seule chose : scroller, liker et <strong>enregistrer</strong> uniquement les reels dans ton domaine (marketing digital, revenus en ligne, liberté financière...)<br>
+    3. Filtre par <strong>beaucoup de commentaires</strong> — c'est le signal que le contenu touche vraiment ta cible. Les likes peuvent être achetés, pas les commentaires.<br>
+    4. Analyse les reels qui reviennent souvent → identifie le format, le hook, le rythme → <strong>reproduis avec ton propre angle</strong> sur ton compte principal<br><br>
+    Résultat : tu arrives sur ta cible avec du contenu prouvé, pas du contenu deviné.
+  </div>
+  <div class="rule warning">⚠ Ce compte ne publie rien. Son seul rôle est de te donner de la matière à analyser et reproduire. C'est une veille concurrentielle, pas un deuxième profil.</div>
+  <ul class="checklist">
+    <li onclick="ck(this,'1_16')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">👁 J'ai créé mon compte de veille et j'ai commencé à enregistrer des reels avec beaucoup de commentaires dans ma niche</span></li>
+  </ul>
+
+  <h3>Stories à la une — à configurer cette semaine</h3>
+  <p>Les stories à la une sont la première chose que voit une prospect qui arrive sur ton profil. Crée ces 5 catégories dès le départ, même si tu n'as pas encore de contenu à mettre dedans.</p>
+  <div class="rule key">💡 Pour tes premiers <strong>Résultats</strong> : tu n'as pas besoin d'attendre ta propre commission. La communauté Skool Code Liberté regorge de témoignages — prends les screenshots de résultats partagés dans la communauté pour alimenter ta story Résultats dès le départ. Utilise les leurs avant d'avoir les tiens.</div>
+  <ul class="checklist">
+    <li onclick="ck(this,'1_7')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">💼 <strong>Mon offre</strong> — ce que tu vends, comment ça marche, comment te contacter</span></li>
+    <li onclick="ck(this,'1_8')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">✅ <strong>Résultats</strong> — screenshots de commission, témoignages, preuves (à alimenter au fur et à mesure)</span></li>
+    <li onclick="ck(this,'1_9')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">❓ <strong>FAQ</strong> — réponses aux questions les plus fréquentes de ta cible</span></li>
+    <li onclick="ck(this,'1_10')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">💬 <strong>Témoignages</strong> — retours de clientes (à alimenter dès ta première vente)</span></li>
+    <li onclick="ck(this,'1_11')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">🙋 <strong>À propos</strong> — ton histoire racontée positivement : ce que tu fais, pourquoi, ce que tu as construit</span></li>
+  </ul>
+
+  <button class="reset-btn" onclick="resetW(1,17)">Réinitialiser la semaine</button>
+</section>
+
+<!-- ══ SEMAINE 2 — BUSINESS ══ -->
+<section class="section" id="s2">
+  <div class="week-badge">Semaine 2 · J8–J14</div>
+  <div class="section-title">Ton business</div>
+  <div class="section-sub">Niche · offre · branding · positionnement</div>
+
+  <div class="progress-wrap"><div class="progress-label"><span>Progression</span><span id="p2b-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="p2b-bar" style="width:0%"></div></div></div>
+
+  <h3>Ta cible</h3>
+  <ul class="checklist">
+    <li onclick="ck(this,'2_0')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai défini qui je veux aider précisément (âge, situation, douleur principale)</span></li>
+    <li onclick="ck(this,'2_1')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai noté les mots exacts qu'elle utilise pour parler de son problème (ses mots, pas les miens)</span></li>
+    <li onclick="ck(this,'2_2')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Je connais les 3 couches de sa douleur (surface / intermédiaire / profonde)</span></li>
+  </ul>
+
+  <h3>Ton offre</h3>
+  <div class="rule key">Ta value stack = ce que tu apportes EN PLUS de la formation Code Liberté. C'est ce qui te différencie de toutes les autres affilié(e)s. Construis-la autour de ce que TU proposes concrètement.</div>
+  <ul class="checklist">
+    <li onclick="ck(this,'2_3')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai listé tout ce que j'offre à ma cliente en plus de la formation (suivi, scripts, appels, Telegram...)</span></li>
+    <li onclick="ck(this,'2_4')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai attribué une valeur perçue à chaque élément de ma stack</span></li>
+    <li onclick="ck(this,'2_5')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai rédigé mon pitch en 3-4 minutes (template dans l'onglet Closing)</span></li>
+  </ul>
+
+  <div class="rule key">
+    <strong>Template value stack :</strong><br>
+    Formation Code Liberté → 497 €<br>
+    [Ton accompagnement perso — appels, suivi...] → [valeur que tu lui attribues]<br>
+    [Tes ressources — scripts, plan, outils...] → [valeur]<br>
+    [Ton accès direct — Telegram, WhatsApp...] → [valeur]<br>
+    <br>
+    <strong>Total valeur perçue : [X] € — Investissement : 497 €</strong>
+  </div>
+
+  <h3>Ton branding</h3>
+  <div class="rule warning">⚠ Ton branding doit être cohérent sur TOUTES tes publications. Une esthétique claire = mémorisation, confiance, professionnalisme. Choisis et tiens-t'en à tes choix.</div>
+  <ul class="checklist">
+    <li onclick="ck(this,'2_6')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai choisi 2-3 couleurs pour mon branding (cohérentes entre elles)</span></li>
+    <li onclick="ck(this,'2_7')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai choisi 1-2 polices pour mes visuels et textes à l'écran</span></li>
+    <li onclick="ck(this,'2_8')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai défini mon ton de voix (direct ? doux ? cash ? inspirant ?)</span></li>
+    <li onclick="ck(this,'2_9')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Mon feed Instagram a une esthétique cohérente (couleurs, ambiance, style)</span></li>
+  </ul>
+
+  <h3>Ton histoire — racontée positivement</h3>
+  <div class="rule warning">⚠ Parler de ta galère, de ta vie difficile, de tes dettes = mal positionner ton business. Ce n'est pas ce qui fait vendre. Ce qui fait vendre : raconter ce que tu as APPRIS, ce que tu CONSTRUIS, et où tu vas. Ton audience veut suivre quelqu'un en chemin vers quelque chose — pas quelqu'un qui se plaint.</div>
+  <ul class="checklist">
+    <li onclick="ck(this,'2_10')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai rédigé mon "avant/après" positivement : ce que j'ai décidé, ce que j'ai construit, où j'en suis</span></li>
+    <li onclick="ck(this,'2_11')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Je sais distinguer "connexion" (mon histoire, mes valeurs) et "conversion" (mon offre, le CTA)</span></li>
+  </ul>
+
+  <div class="rule key">
+    <strong>Formule histoire positive :</strong><br>
+    ❌ "J'étais dans la galère, j'avais rien..."<br>
+    ✅ "J'ai décidé de prendre les choses en main. J'ai appris le marketing digital. J'ai fait ma première vente. Maintenant j'aide d'autres à faire pareil."<br><br>
+    C'est le même chemin — raconté comme quelqu'un de proactif, pas comme une victime.
+  </div>
+
+  <button class="reset-btn" onclick="resetW(2,12)">Réinitialiser la semaine</button>
+</section>
+
+<!-- ══ SEMAINE 3 — CONTENU ══ -->
+<section class="section" id="s3">
+  <div class="week-badge">Semaine 3 · J15–J21</div>
+  <div class="section-title">Contenu</div>
+  <div class="section-sub">Stratégie connexion · conversion · stories · reels</div>
+
+  <div class="progress-wrap"><div class="progress-label"><span>Progression</span><span id="p3b-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="p3b-bar" style="width:0%"></div></div></div>
+
+  <h3>Stratégie : connexion + conversion</h3>
+  <div class="rule key">
+    Ton contenu se divise en 2 catégories :<br><br>
+    <strong>Connexion (60–70%)</strong> — crée l'identification. Ton histoire (positive), tes apprentissages, ton quotidien, tes valeurs. L'audience te suit parce qu'elle se reconnaît en toi.<br><br>
+    <strong>Conversion (30–40%)</strong> — génère les DMs et les ventes. Présentation de l'offre, résultats, preuves, appel à l'action ("envoie-moi un DM", "lien en bio").
+  </div>
+  <div class="rule warning">⚠ Ne fais pas que de la conversion — tu vas passer pour quelqu'un qui ne fait que vendre. Ne fais pas que de la connexion — personne ne saura ce que tu proposes. Les deux ensemble = confiance + ventes.</div>
+
+  <h3>Reels</h3>
+  <div class="rule key">👁 <strong>Compte de veille :</strong> tu l'as créé en Sem.1 — c'est maintenant qu'il est utile. Consulte les reels enregistrés dans ta niche, identifie les formats qui ont beaucoup de commentaires, et reproduis leur structure avec ton propre angle.</div>
+  <ul class="checklist">
+    <li onclick="ck(this,'3_0')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai créé ma liste de 10 hooks (basés sur la douleur de ma cible dans SES mots)</span></li>
+    <li onclick="ck(this,'3_1')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Je poste minimum 1 reel par jour (format B-roll + texte overlay = le plus simple)</span></li>
+    <li onclick="ck(this,'3_2')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'alterne connexion et conversion sur ma semaine de contenu</span></li>
+    <li onclick="ck(this,'3_3')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Mon CTA est clair sur les reels de conversion ("envoie-moi 'info' en DM", "lien en bio")</span></li>
+  </ul>
+
+  <h3>Stories quotidiennes</h3>
+  <div class="rule">Objectif : 5 à 8 stories par jour. Les stories gardent ta communauté chaude entre deux reels et créent de la proximité. Formats qui fonctionnent :</div>
+
+  <div class="card">
+    <div class="card-title">Formats de stories</div>
+    <div class="script" style="margin-bottom:6px;"><span class="label">Apprentissage du jour</span>"Aujourd'hui j'ai compris que [insight sur le business / le contenu / la vente]. Si tu veux en savoir plus → DM"</div>
+    <div class="script" style="margin-bottom:6px;"><span class="label">Question à ta communauté</span>Poll / quiz sur la douleur de ta cible. Ex : "T'arrives à te payer tes dépenses toute seule ? Oui / Pas encore"</div>
+    <div class="script" style="margin-bottom:6px;"><span class="label">Coulisses positives</span>Ce que tu travailles aujourd'hui, ce que tu construis, un résultat (même petit)</div>
+    <div class="script" style="margin-bottom:0;"><span class="label">CTA direct</span>"Tu veux comprendre comment je fais → DM moi 'info'" — simple, direct, sans drama</div>
+  </div>
+
+  <h3>Stories à la une — finaliser</h3>
+  <ul class="checklist">
+    <li onclick="ck(this,'3_4')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">💼 Mon offre — j'ai ajouté au moins 3 stories expliquant ce que je vends</span></li>
+    <li onclick="ck(this,'3_5')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">❓ FAQ — j'ai répondu aux 5 questions que ma cible pose le plus souvent</span></li>
+    <li onclick="ck(this,'3_6')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">🙋 À propos — mon histoire racontée positivement (ce que j'ai construit, pas ce que j'ai souffert)</span></li>
+  </ul>
+
+  <h3>Plan de contenu semaine</h3>
+  <ul class="checklist">
+    <li onclick="ck(this,'3_7')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai planifié mes 7 reels de la semaine (thème + type : connexion ou conversion)</span></li>
+    <li onclick="ck(this,'3_8')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai filmé en avance (batch) pour ne pas dépendre de l'inspiration chaque jour</span></li>
+    <li onclick="ck(this,'3_9')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Je réponds à tous les DMs entrants dans les 24h (pas après)</span></li>
+  </ul>
+
+  <button class="reset-btn" onclick="resetW(3,10)">Réinitialiser la semaine</button>
+</section>
+
+<!-- ══ SEMAINE 4 — CLOSING ══ -->
+<section class="section" id="s4">
+  <div class="week-badge">Semaine 4 · J22–J28</div>
+  <div class="section-title">DMs & Closing</div>
+  <div class="section-sub">Qualifier · closer en appel ou en DM · première vente</div>
+
+  <div class="progress-wrap"><div class="progress-label"><span>Progression</span><span id="p4b-pct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="p4b-bar" style="width:0%"></div></div></div>
+
+  <div class="rule key">💡 Tu peux closer en appel ou directement en DM — les deux fonctionnent. L'appel est recommandé pour les prospects chauds. Le DM fonctionne pour ceux qui préfèrent écrire ou les relances. Pas une méthode meilleure que l'autre.</div>
+
+  <h3>Maîtriser les scripts DM</h3>
+  <ul class="checklist">
+    <li onclick="ck(this,'4_0')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai lu et intégré les scripts DM de qualification (onglet "Scripts DM")</span></li>
+    <li onclick="ck(this,'4_1')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">Je sais identifier un profil go vs. no-go dès les 3 premières réponses</span></li>
+    <li onclick="ck(this,'4_2')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai envoyé mes premiers messages de qualification aux DMs entrants</span></li>
+    <li onclick="ck(this,'4_3')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai sorti proprement les profils no-fit sans perdre de temps</span></li>
+  </ul>
+
+  <h3>Ton premier closing (appel ou DM)</h3>
+  <ul class="checklist">
+    <li onclick="ck(this,'4_4')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai eu mon premier appel découverte OU j'ai closé mon premier prospect en DM</span></li>
+    <li onclick="ck(this,'4_5')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai creusé la douleur de ma prospect avant de pitcher</span></li>
+    <li onclick="ck(this,'4_6')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai annoncé le prix clairement et proposé le 3×167 € si nécessaire</span></li>
+    <li onclick="ck(this,'4_7')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai traité les objections sans abandonner</span></li>
+  </ul>
+
+  <h3>Première vente ✅</h3>
+  <ul class="checklist">
+    <li onclick="ck(this,'4_8')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">🎉 Première vente faite — j'ai prévenu mon accompagnateur sur Telegram</span></li>
+    <li onclick="ck(this,'4_9')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai envoyé un message de bienvenue à ma cliente dans l'heure qui suit</span></li>
+    <li onclick="ck(this,'4_10')"><div class="check-box"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FDFCFB" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="item-text">J'ai commencé à construire mon espace d'onboarding pour mes futures clientes</span></li>
+  </ul>
+
+  <button class="reset-btn" onclick="resetW(4,11)">Réinitialiser la semaine</button>
+</section>
+
+<!-- ══ SCRIPTS DM ══ -->
+<section class="section" id="dm">
+  <div class="section-title">Scripts DM</div>
+  <div class="section-sub">Qualification en 3 messages</div>
+
+  <div class="rule warning">⚠ Qualifie avant d'inviter. Un profil no-fit qui passe en appel = temps perdu. Ces 3 messages te permettent de le savoir en quelques minutes.</div>
+
+  <h3>Étape 0 — Comprendre la situation actuelle</h3>
+  <p>Dès le premier DM entrant, ton objectif est de comprendre sa situation. Tu n'as pas besoin de le demander directement — en général elle te l'explique. Sinon :</p>
+  <div class="script">
+    <span class="label">Réponse au DM entrant</span>
+    "Coucou ! Tu peux me dire un peu ta situation en ce moment ?"
+    <div class="note">Ce qu'elle dit te donne immédiatement le signal.</div>
+    <span class="go">✓ GO : étudiante, job étudiant, CDI, revenus actifs → continuer</span>
+    <span class="stop">✗ STOP : pas d'argent du tout, aucun revenu, mineur sans accord parental → disqualifier proprement</span>
+  </div>
+
+  <h3>Message 1 — Situation désirée</h3>
+  <div class="script">
+    <span class="label">Message 1</span>
+    "Qu'est-ce qui fait que tu t'intéresses au marketing digital, qu'est-ce qui fait que tu t'y es intéressée ?"
+    <span class="go">✓ GO : raison cohérente et envisageable (indépendance financière, générer un revenu complémentaire, quitter son job...) → continuer</span>
+    <span class="stop">✗ STOP : réponse incohérente, irréaliste ou WTF ("vouloir devenir millionnaire en 1 mois", "juste voir ce que c'est"...) → ne pas continuer</span>
+  </div>
+
+  <h3>Message 2 — Budget (subtil)</h3>
+  <div class="script">
+    <span class="label">Message 2</span>
+    "Ok comment tu t'en sors tous les mois ? T'arrives à payer tes factures ou c'est un peu la galère ?"
+    <span class="go">✓ GO : s'en sort, a un minimum mobilisable → continuer au message 3</span>
+    <span class="stop">✗ STOP : vraiment dans la galère, zéro moyen → ne pas pousser. Relance dans 30 jours si la situation change.</span>
+    <div class="note">Ne jamais demander directement "t'as combien sur ton compte". Subtil = elle répond honnêtement sans se braquer.</div>
+  </div>
+
+  <h3>Message 3 — Proposer la suite</h3>
+  <div class="fork" style="margin-top:12px;">
+    <div class="fork-card" onclick="selectFork('dm-appel',this)">
+      <div class="fork-icon">📞</div>
+      <div class="fork-title">Vers un appel</div>
+      <div class="fork-desc">Recommandé si elle est chaude</div>
+    </div>
+    <div class="fork-card" onclick="selectFork('dm-dm',this)">
+      <div class="fork-icon">💬</div>
+      <div class="fork-title">Closing en DM</div>
+      <div class="fork-desc">Elle préfère écrire</div>
+    </div>
+  </div>
+
+  <div class="fork-content active" id="fork-dm-appel">
+    <div class="script">
+      <span class="label">Message 3 — Vers un appel</span>
+      "En soi par rapport à ta situation je vois que je peux t'aider et te proposer une solution, si t'es partante on part sur un petit appel de 30–40 min où on creuse un peu plus ta situation d'aujourd'hui et moi de mon côté si je vois que je peux t'aider je te proposerai mon accompagnement, ça te va ?"
+    </div>
+  </div>
+
+  <div class="fork-content" id="fork-dm-dm">
+    <div class="script">
+      <span class="label">Message 3 — Closing en DM</span>
+      "En soi par rapport à ta situation je vois que je peux t'aider et te proposer une solution, je peux te partager les infos directement ici si tu préfères pas les appels — ça te va ?"
+      <div class="note">→ Si oui : tu suis la structure de closing DM (onglet "Closing").</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3>Sortie propre — profil no-fit</h3>
+  <div class="script">
+    "Pas de souci ! À ce stade je pense que c'est pas le bon moment, mais garde un œil sur mon contenu — ça peut évoluer. 🤍"
+  </div>
+
+  <h3>Cas particulier — 16-17 ans</h3>
+  <div class="rule legal">Un prospect de 16-17 ans peut se lancer, mais il a besoin d'une autorisation parentale pour se déclarer et percevoir des paiements. Si c'est son cas, lui mentionner avant l'appel ou en DM : <em>"Pour te lancer légalement à ton âge, tu auras besoin de l'accord d'un parent — c'est une formalité, mais c'est obligatoire."</em></div>
+
+  <div class="divider"></div>
+  <h3>Relance J+7 (pas de réponse)</h3>
+  <div class="script">"Hey, je voulais juste reprendre contact — t'as eu le temps de réfléchir ? Aucune pression de mon côté. 🤍"</div>
+
+  <h3>Relance J+30 (budget insuffisant)</h3>
+  <div class="script">"Hey, on avait échangé le mois dernier — le timing était pas idéal pour toi. Tu en es où maintenant ? Il reste quelques places ce mois-ci si tu veux qu'on en discute."</div>
+</section>
+
+<!-- ══ CLOSING ══ -->
+<section class="section" id="closing">
+  <div class="section-title">Closing</div>
+  <div class="section-sub">Structure d'appel · closing DM · pitch à personnaliser</div>
+
+  <div class="fork" style="margin-top:4px;">
+    <div class="fork-card selected" onclick="selectFork('cl-appel',this)">
+      <div class="fork-icon">📞</div>
+      <div class="fork-title">Appel</div>
+      <div class="fork-desc">Structure complète 30–40 min</div>
+    </div>
+    <div class="fork-card" onclick="selectFork('cl-dm',this)">
+      <div class="fork-icon">💬</div>
+      <div class="fork-title">DM Closing</div>
+      <div class="fork-desc">Script écrit complet</div>
+    </div>
+  </div>
+
+  <!-- APPEL -->
+  <div class="fork-content active" id="fork-cl-appel">
+
+    <div class="obj-row">
+      <div class="obj-trigger" onclick="toggleObj(this.parentElement)">
+        <span><strong>1 — Cadrage</strong> <span style="font-size:11px;color:var(--mid);">2 min</span></span><span class="arrow">▾</span>
+      </div>
+      <div class="obj-body">
+        <div class="script">"Ça va ? Tu m'entends bien ?"</div>
+        <div class="script">"J'ai prévu 30–40 min. Je vais te poser quelques questions pour voir si je peux t'aider. Si oui, je te parle de mon plan. Si non, c'est complètement ok. C'est bon pour toi ?"</div>
+      </div>
+    </div>
+
+    <div class="obj-row">
+      <div class="obj-trigger" onclick="toggleObj(this.parentElement)">
+        <span><strong>2 — Questionnement</strong> <span style="font-size:11px;color:var(--mid);">15 min min</span></span><span class="arrow">▾</span>
+      </div>
+      <div class="obj-body">
+        <div class="rule" style="margin-top:12px;">Elle doit formuler la solution elle-même. Écouter. Noter ses mots exacts.</div>
+        <div class="script"><span class="label">Situation actuelle</span>"Tu en es où concrètement en ce moment ?"</div>
+        <div class="script"><span class="label">Frustration</span>"Qu'est-ce qui te frustre le plus en ce moment ?"</div>
+        <div class="script"><span class="label">Douleur profonde</span>"Ça t'impacte comment au quotidien ?" / "Qu'est-ce que ça te coûte de rester là ?"</div>
+        <div class="script"><span class="label">Désirée + chiffre ✎</span>"C'est quoi tes objectifs ? Tu veux générer combien ?"</div>
+        <div class="script"><span class="label">Ce qui bloque</span>"Qu'est-ce qui fait qu'aujourd'hui t'es encore dans cette situation ?"</div>
+        <div class="script"><span class="label">Sa solution 🔑</span>"Selon toi, qu'est-ce qui te permettrait d'atteindre tes objectifs ?"<div class="note">Elle dit "un plan / accompagnement" → "Exactement. C'est ce que je t'apporte."</div></div>
+        <div class="script"><span class="label">Urgence</span>"Pendant encore combien de temps t'as envie que ta peur prenne des décisions à ta place ?"</div>
+        <div class="script"><span class="label">Backward framing</span>"Si il y a 6 mois tu t'étais fait accompagner, tu en serais où aujourd'hui ?"</div>
+        <div class="script"><span class="label">Transition</span>"J'ai tout ce qu'il me faut. Je pense que oui je peux t'aider. T'as envie que je t'explique comment je travaille ?"</div>
+      </div>
+    </div>
+
+    <div class="obj-row">
+      <div class="obj-trigger" onclick="toggleObj(this.parentElement)">
+        <span><strong>3 — Pitch</strong> <span style="font-size:11px;color:var(--mid);">3–4 min max</span></span><span class="arrow">▾</span>
+      </div>
+      <div class="obj-body">
+        <div class="rule warning" style="margin-top:12px;">⚠ Max 4 min. Si elle coupe → "Je t'explique tout, tu poses tes questions à la fin."</div>
+        <div class="script"><span class="label">1 — Relier à elle</span>"Donc si j'ai bien compris, toi tu veux [SES MOTS EXACTS]. C'est exactement pour ça que je vais te parler de ce que je fais."</div>
+        <div class="script"><span class="label">2 — Ce que c'est</span>"Je vends des produits digitaux — formations, ebooks, accompagnements. Tout en ligne, pas de stock, pas de livraison."</div>
+        <div class="script"><span class="label">3 — Comment tu gagnes</span>"T'as deux façons de gagner : créer ton propre produit, ou revendre la formation et toucher une commission. Dès ta première vente tu récupères ton investissement."</div>
+        <div class="script"><span class="label">4 — Ce que toi tu apportes [personnalise ici]</span>"Tu n'es pas seule. Je te donne [ton accompagnement — plan, scripts, suivi]. J'accompagne [X] nouvelles clientes max par mois pour rester vraiment disponible."</div>
+        <div class="script"><span class="label">5 — Validation</span>"Par rapport à ce que tu m'as dit sur [son problème en ses mots], tu vois comment ça pourrait t'aider ?"</div>
+        <div class="script"><span class="label">6 — Si hésitation</span>"Si il y a 6 mois tu t'étais fait accompagner, tu te serais dit let's go — ou tu en serais où aujourd'hui ?"</div>
+      </div>
+    </div>
+
+    <div class="obj-row">
+      <div class="obj-trigger" onclick="toggleObj(this.parentElement)">
+        <span><strong>4 — Prix & closing</strong></span><span class="arrow">▾</span>
+      </div>
+      <div class="obj-body">
+        <div class="script" style="margin-top:12px;"><span class="label">Transition</span>"Tu as des questions ? → À combien de % le plan te correspond ?"</div>
+        <div class="script"><span class="label">Prix</span>"C'est 497 €. Ou 3×167 €. Dès ta première vente en affiliation tu récupères ton investissement — une commission c'est environ [montant]. Deux ventes et tu es en bénéfice."</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <h3>Ton pitch — template à personnaliser</h3>
+    <div class="rule key">Ce template est une base. Adapte chaque ligne à TON histoire et TA cible. Un pitch authentique convertit mieux qu'un script parfait récité.</div>
+    <div class="script"><span class="label">Template complet</span>
+    "Donc si j'ai bien compris, toi tu veux [ses mots]. C'est exactement pour ça que je vais te parler de ce que je fais.<br><br>Je vends des produits digitaux — tout se passe en ligne, pas de stock, pas de livraison.<br><br>T'as deux façons de gagner : créer ton propre produit sur ce qui te passionne, ou revendre la formation et toucher une commission. Dès ta première vente tu récupères ton invest.<br><br>Et tu n'es pas seule — je te donne [ce que TU proposes concrètement]. J'accompagne [X] nouvelles clientes max par mois pour rester vraiment là.<br><br>Par rapport à ce que tu m'as dit sur [son problème], tu vois comment ça pourrait t'aider ?"</div>
+  </div>
+
+  <!-- DM CLOSING -->
+  <div class="fork-content" id="fork-cl-dm">
+    <div class="rule" style="margin-top:0;">Le closing en DM suit la même logique qu'en appel — creuser la douleur, faire verbaliser le besoin, pitcher, annoncer le prix. La différence : tout s'écrit.</div>
+
+    <div class="script"><span class="label">1 — Creuser la douleur</span>"Je veux bien comprendre ta situation avant de te parler de ce que je fais — qu'est-ce qui t'a amenée à m'écrire ?"</div>
+    <div class="script"><span class="label">2 — Désirée + chiffre</span>"C'est quoi l'objectif pour toi — tu veux générer combien par mois ?"</div>
+    <div class="script"><span class="label">3 — Faire verbaliser le besoin 🔑</span>"Selon toi, si tu avais les bonnes compétences et quelqu'un pour te guider, tu penses que tu pourrais atteindre ça ?"<div class="note">Elle dit oui → tu as son accord de principe. Ton pitch est déjà pré-vendu.</div></div>
+    <div class="script"><span class="label">4 — Pitch (résumé DM)</span>"Je vends des produits digitaux — formations, ebooks, accompagnements. T'as deux options : créer ton produit ou revendre la formation et toucher une commission. Dès ta 1ère vente tu récupères ton invest. Et tu n'es pas seule — [ce que tu proposes]. J'accompagne [X] clientes max/mois."</div>
+    <div class="script"><span class="label">5 — Validation</span>"Par rapport à [son problème en ses mots], tu vois comment ça pourrait t'aider ?"</div>
+    <div class="script"><span class="label">6 — Prix</span>"C'est 497 €, ou 3×167 €. Tu veux qu'on voit comment ça pourrait coller pour toi ?"</div>
+    <div class="script"><span class="label">7 — Si elle hésite</span>"Je comprends. Qu'est-ce qui fait que t'hésites encore — c'est le prix, une peur, ou autre chose ?" → elle verbalise → traiter ce qu'elle dit.</div>
+  </div>
+</section>
+
+<!-- ══ OBJECTIONS ══ -->
+<section class="section" id="objections">
+  <div class="section-title">Objections</div>
+  <div class="section-sub">Ce que tes prospects vont dire — et comment répondre</div>
+
+  <div class="rule">Les fausses croyances se traitent <strong>pendant le questionnement</strong>, avant le prix. Si une objection revient après le prix → elle n'a pas été bien traitée avant.</div>
+
+  <h3>Fausses croyances — à traiter avant le pitch</h3>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>"C'est dur de trouver des clients"</span><span class="arrow">▾</span></div><div class="obj-body"><div class="script">"Qu'est-ce qui te fait penser ça ? Les gens qui disent ça ont essayé seuls, sans plan, sans accompagnement. C'est pas la même chose que d'avoir quelqu'un qui te guide."</div></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>"J'ai pas les compétences"</span><span class="arrow">▾</span></div><div class="obj-body"><div class="script">"T'as pas besoin d'en avoir au départ. Tu les construis étape par étape, avec quelqu'un à côté."</div></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>"Le marché est saturé"</span><span class="arrow">▾</span></div><div class="obj-body"><div class="script">"Les gens qui réussissent font des ventes chaque jour. Ce qui est saturé, c'est l'approche sans méthode. Avec un plan clair, c'est différent."</div></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>"J'ai peur d'être arnaquée"</span><span class="arrow">▾</span></div><div class="obj-body"><div class="script">"T'as raison d'être prudente. C'est pour ça que je sélectionne — je ne vends qu'aux profils qui ont les conditions pour réussir."</div></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>"J'ai pas le temps"</span><span class="arrow">▾</span></div><div class="obj-body"><div class="script">"1h par jour suffit. Le plan est structuré pour ça — une action à la fois. La vraie question c'est pas le temps, c'est la priorité."</div></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>"Mon cas est différent"</span><span class="arrow">▾</span></div><div class="obj-body"><div class="script">"Qu'est-ce qui te fait penser que ton cas est différent ?" → Laisser parler. Puis : "Ce que tu décris, c'est ce que vivent toutes les personnes qui ont réussi avant toi. La différence, c'est qu'elles ont quand même commencé."</div></div></div>
+
+  <div class="divider"></div>
+  <h3>Objections après le prix</h3>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>"J'ai pas le budget"</span><span class="arrow">▾</span></div><div class="obj-body"><div class="script">"Il y a le 3×167 €. Et dès ta première vente tu récupères tout — tu m'as dit que tu veux [objectif chiffré], une commission c'est environ [montant]."</div></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>"Je vais y réfléchir / je reviens"</span><span class="arrow">▾</span></div><div class="obj-body">
+    <div class="rule key" style="margin-top:12px;">💡 Ta posture d'abord : tu es là pour l'aider, pas pour lui vendre quelque chose. En tant que personne qui veut vraiment l'aider, tu ne lui rends pas service en la laissant partir sans solution. Sa peur sera là aujourd'hui, demain, dans une semaine — elle ne disparaît pas toute seule.</div>
+    <p style="margin-top:10px;font-size:12px;font-weight:600;color:var(--deep);">Si elle doit réfléchir, il y a forcément une raison. Identifie laquelle :</p>
+    <div class="script"><span class="label">Option 1 — Budget (objection logistique)</span>"Est-ce que c'est une question de budget ?" → Si oui → "On peut voir pour un plan de paiement — ça représente 3×167 €. Est-ce que ça change quelque chose pour toi ?"</div>
+    <div class="script"><span class="label">Option 2 — Peur</span>"Sa peur sera là aujourd'hui, demain, dans une semaine. Tu ne lui rends pas service en la laissant partir avec elle." → "Qu'est-ce qui te fait hésiter — c'est une peur concrète ? Dis-moi ce que c'est, on la traite maintenant."</div>
+    <div class="script"><span class="label">Option 3 — Valeur ("c'est trop cher")</span>"Je comprends. Qu'est-ce qui te fait penser que le prix est trop élevé par rapport à ce que tu reçois ?" → Retravailler la value stack : "Dès ta première vente tu récupères ton investissement. Une commission = ~[montant]. La question c'est pas si ça vaut le prix — c'est si tu veux que ça change."</div>
+    <div class="script"><span class="label">Dans tous les cas — posture</span>"Je te présente la solution à ton problème aujourd'hui. Qu'est-ce qui fait que tu ne la prends pas ?" → Écouter. Traiter. Ne jamais laisser partir sans avoir traité.</div>
+  </div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>"J'en parle à X"</span><span class="arrow">▾</span></div><div class="obj-body"><div class="script">"Je comprends. Qu'est-ce que tu penses qu'ils vont te dire ?" → Laisser parler. Traiter l'objection derrière — c'est souvent la peur du jugement.</div></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>"Et si je fais pas de vente ?"</span><span class="arrow">▾</span></div><div class="obj-body"><div class="script">"C'est pour ça que je t'accompagne jusqu'à ta première vente. Et c'est pour ça que je sélectionne — je prends que les profils qui ont les conditions pour réussir."</div></div></div>
+
+  <div class="divider"></div>
+  <h3>Le calcul de perte — si elle hésite encore</h3>
+  <div class="script">"Tu m'as dit que tu veux [X] €/mois. Chaque mois sans agir c'est [X] € que tu laisses sur la table. Ça fait combien de mois que tu attends ?"</div>
+  <div class="script">"Pendant encore combien de temps t'as envie que ta peur prenne des décisions à ta place ?"</div>
+</section>
+
+<!-- ══ PROMPTS IA ══ -->
+<section class="section" id="prompts">
+  <div class="section-title">Prompts IA</div>
+  <div class="section-sub">ChatGPT / Claude — copie, adapte, utilise</div>
+
+  <div class="rule key">Ces prompts sont des bases à personnaliser avec tes infos. Remplace tout ce qui est entre [crochets] par tes données réelles. Plus tu détailles, meilleur sera le résultat.</div>
+
+  <h3>Semaine 1 — Fondations</h3>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Rédiger ta bio Instagram</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>Aide-moi à rédiger ma bio Instagram pour vendre des produits digitaux en affiliation. Je m'appelle [prénom]. J'aide [décris ta cible précisément] à [résultat que tu leur apportes] grâce à [méthode / ce que tu proposes]. Propose-moi 3 versions de bio (150 caractères max chacune), directes, avec un CTA clair. La bio ne doit PAS mentionner ma galère ou ma vie difficile — seulement ce que j'apporte et à qui.</p>
+  </div>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Définir ta niche</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>Je vends des produits digitaux en affiliation (formations de marketing digital). Je veux définir ma niche précise. Voici ce que je sais sur moi : [décris ton profil, d'où tu viens, ce que tu as vécu]. Propose-moi 3 niches potentielles avec pour chacune : l'avatar type (âge, situation), la douleur principale, et pourquoi je suis légitime pour l'adresser.</p>
+  </div>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Texte "À propos" positif</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>Aide-moi à rédiger mon texte "À propos" pour mon compte Instagram. Voici mon histoire : [décris ton parcours — ce que tu as décidé, ce que tu as appris, où tu en es]. Le texte doit être positif et mettre en valeur ce que j'ai CONSTRUIT, pas ce que j'ai souffert. Ton de voix : [direct / inspirant / bienveillant — choisis]. Longueur : 5-8 phrases max.</p>
+  </div>
+
+  <h3>Semaine 2 — Business</h3>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Construire ta value stack</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>Je vends une formation de marketing digital à 497 €. Je veux construire ma value stack personnalisée. En plus de la formation, je propose à ma cliente : [liste tout ce que tu proposes : suivi Telegram, appels, scripts, plan semaine par semaine...]. Pour chaque élément, aide-moi à définir une valeur perçue réaliste. Présente le tout sous forme de tableau avec : élément, description courte, valeur perçue. Total valeur vs. 497 € à la fin.</p>
+  </div>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Définir ta cible en profondeur</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>Je veux définir mon avatar client idéal pour vendre des formations de marketing digital. Voici ce que je sais de ma cible : [âge approximatif, situation — étudiante / jeune salariée, douleur principale]. Aide-moi à construire sa fiche complète : identité, douleur en 3 couches (surface / intermédiaire / profonde), ce qu'elle a déjà essayé, ce qui la bloque, ses mots exacts. Format : fiche claire et opérationnelle.</p>
+  </div>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Ton branding en 5 minutes</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>Aide-moi à définir mon branding pour mon compte business de marketing digital. Ma cible : [description]. Mon positionnement : [ce que je vends, comment je me différencie]. L'ambiance que je veux dégager : [ex : sobre et confiant / féminin et ambitieux / direct et cash]. Propose-moi : une palette de 3 couleurs avec codes hex, 2 polices complémentaires (disponibles gratuitement sur Google Fonts), et 5 mots qui décrivent mon ton de voix.</p>
+  </div>
+
+  <h3>Semaine 3 — Contenu</h3>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Générer 10 hooks de reels</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>Je vends des formations de marketing digital. Ma cible : [description précise — âge, situation, douleur]. Génère-moi 10 hooks de reels Instagram / TikTok. Répartis en : 4 hooks "miroir de la douleur" (elle se reconnaît), 3 hooks "reframe" (elle comprend quelque chose de nouveau), 3 hooks "preuve / aspiration". Utilise les mots exacts qu'elle utiliserait pour parler de son problème, pas le vocabulaire d'un marketeur.</p>
+  </div>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Plan de contenu 7 jours</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>Crée-moi un plan de contenu pour les 7 prochains jours. Je vends des formations de marketing digital. Ma cible : [description]. Objectif : générer des DMs qualifiés. Pour chaque jour : thème du reel, type (connexion ou conversion), idée de hook, format recommandé (B-roll texte / face cam / voix off). Alterne connexion et conversion. Ne mets pas "commentaires" comme objectif — l'objectif c'est les DMs.</p>
+  </div>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Script de reel (voix off ou face cam)</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>Écris-moi le script d'un reel de [30 / 45 / 60 secondes]. Hook : [écris ton hook]. Type : [connexion ou conversion]. Mon positionnement : [ce que je vends, à qui]. Objectif : [créer de l'identification / générer des DMs / présenter l'offre]. Le script doit être naturel, parlé, sans jargon. Termine par un CTA clair si conversion.</p>
+  </div>
+
+  <div class="prompt-box">
+    <span class="prompt-label">5 idées de stories FAQ</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>Je vends des formations de marketing digital à [ma cible]. Génère-moi 5 idées de stories FAQ que ma cible se pose avant d'acheter. Pour chacune : la question (dans ses mots), une réponse courte et directe (3-4 phrases max), et si c'est mieux en texte, en poll, ou en vidéo.</p>
+  </div>
+
+  <h3>Semaine 4 — DMs & Closing</h3>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Analyser une conversation DM</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>Analyse cette conversation DM et dis-moi si ce prospect est go ou no-go pour un appel. Si go, dis-moi comment répondre au prochain message. Si no-go, dis-moi pourquoi et comment sortir proprement. Voici la conversation : [colle la conversation exactement].</p>
+  </div>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Personnaliser ton pitch pour un appel</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>J'ai un appel découverte dans [X minutes / aujourd'hui]. Voici ce que je sais de ma prospect : [sa situation, sa douleur en ses mots, son objectif chiffré, ce qui la bloque]. Aide-moi à personnaliser mon pitch pour cet appel. Mon offre : [formation Code Liberté 497 €, + ce que j'apporte en plus]. Le pitch doit utiliser ses mots exacts et lier directement son problème à ma solution.</p>
+  </div>
+
+  <div class="prompt-box">
+    <span class="prompt-label">Répondre à une objection</span>
+    <button class="copy-btn" onclick="copyPrompt(this)">Copier</button>
+    <p>En appel / en DM, ma prospect vient de me dire : "[colle l'objection exacte]". Comment je réponds ? Mon offre : [formation 497 €, accompagnement jusqu'à la 1ère vente, 3×167 € disponible]. Donne-moi une réponse naturelle, pas agressive, qui traite la vraie peur derrière l'objection.</p>
+  </div>
+</section>
+
+<!-- ══ RESSOURCES ══ -->
+<section class="section" id="ressources">
+  <div class="section-title">Ressources</div>
+  <div class="section-sub">Outils · liens · Drive</div>
+
+  <h3>Drive — ressources & mises à jour</h3>
+  <div class="rule key">Le Drive est mis à jour régulièrement avec de nouvelles ressources : templates, scripts, exemples de contenu, outils recommandés. Consulte-le régulièrement.</div>
+  <a href="https://drive.google.com/drive/folders/1kRFikf4a3InnAN5jnoDN1fKjXOs840BS?usp=share_link" target="_blank" class="link-btn"><span class="icon">📁</span> Accéder au Drive partagé</a>
+
+  <div class="divider"></div>
+  <h3>Contact direct</h3>
+  <a href="https://t.me/noiradigital" target="_blank" class="link-btn"><span class="icon">✉️</span> Telegram — pour toutes tes questions</a>
+
+  <div class="divider"></div>
+  <h3>Outils gratuits recommandés</h3>
+  <div class="card">
+    <div class="card-title">Création de contenu</div>
+    <p><strong>CapCut</strong> — montage vidéo mobile, sous-titres automatiques, templates reels</p>
+    <p><strong>Canva</strong> — visuels, stories à la une, templates branding</p>
+    <p><strong>ChatGPT / Claude</strong> — scripts, hooks, captions, idées de contenu (voir onglet Prompts IA)</p>
+  </div>
+  <div class="card">
+    <div class="card-title">Gestion & organisation</div>
+    <p><strong>Notion</strong> — tracker de prospects, planning de contenu, CRM simple</p>
+    <p><strong>Google Drive</strong> — stockage, partage de ressources avec tes clientes</p>
+    <p><strong>Telegram</strong> — suivi client, support, groupes</p>
+  </div>
+  <div class="card">
+    <div class="card-title">Légal</div>
+    <p><strong>France — auto-entrepreneur :</strong> autoentrepreneur.urssaf.fr</p>
+    <p><strong>Belgique — indépendant :</strong> economie.fgov.be / guichet-entreprises.be</p>
+    <p><strong>Si mineur (16-17 ans) :</strong> accord parental obligatoire — démarche identique avec cosignature d'un parent.</p>
+  </div>
+</section>
+
+<!-- ══ FAQ ══ -->
+<section class="section" id="faq">
+  <div class="section-title">FAQ</div>
+  <div class="section-sub">Les questions les plus fréquentes</div>
+
+  <div class="rule key">Ta question n'est pas là ? <a href="https://t.me/noiradigital" target="_blank" style="color:var(--accent);font-weight:600;">Telegram</a> — je réponds en direct.</div>
+
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Combien de temps avant ma première vente ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:12px;">Ça dépend de ta régularité et de ta capacité à appliquer. L'objectif de ce pack : ta première vente avant la fin des 4 semaines. C'est réaliste si tu postes chaque jour et que tu gères tes DMs sérieusement.</p></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Je dois montrer mon visage ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:12px;">Non. Tu peux vendre en mode anonyme — B-roll + texte overlay, voix off, ou uniquement en DM. L'identité se construit sur ton message et ta valeur, pas ton visage.</p><div class="rule key" style="margin-top:10px;">📌 Dans la formation Code Liberté, va voir le module <strong>"Vendre en faceless"</strong> — il a été créé par une femme qui a énormément chiffré sans jamais se montrer. Tout y est expliqué : méthodes, formats, stratégie complète. Si tu veux vendre sans te montrer, commence par là.</div></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Tout depuis mon téléphone ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:12px;">Oui. Reels, DMs, appels, page de vente — tout se gère depuis un smartphone. Pas besoin d'ordinateur pour démarrer.</p></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Comment fonctionne le paiement de ma commission ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:12px;">Ta commission est versée sur ton compte <strong>Beacons</strong>. Depuis Beacons, tu retires vers ton compte <strong>PayPal Business</strong>. Délai de traitement : <strong>5 jours ouvrés</strong> après encaissement complet de la vente (si paiement en 3× : après le dernier paiement).</p><p style="font-size:12px;margin-top:8px;">Problème de commission ? Contacte <strong>support@codeliberte.com</strong> — objet : "Problème de commission". À fournir : ton nom/prénom, date de la vente, email du client, si paiement 1× ou échelonné, ton RIB.</p></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Est-ce que je dois me déclarer avant de vendre ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:12px;">Oui — pour percevoir des commissions légalement tu dois avoir un statut. En France : auto-entrepreneur (urssaf.fr). En Belgique : déclaration d'activité indépendante. Si tu as 16-17 ans, un parent doit cosigner. Voir aussi la section légale dans Semaine 1.</p></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>J'ai rien vendu en ligne avant — c'est pour moi ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:12px;">C'est exactement pour toi. Ceux qui partent de zéro n'ont pas de mauvaises habitudes à défaire. Tu as un plan, un accompagnement, et l'envie que ça change. Le reste se construit.</p></div></div>
+  <div class="obj-row"><div class="obj-trigger" onclick="toggleObj(this.parentElement)"><span>Jusqu'à quand suis-je accompagné(e) ?</span><span class="arrow">▾</span></div><div class="obj-body"><p style="margin-top:12px;">Jusqu'à ta première vente. L'objectif est que tu sois autonome après ça. Telegram est disponible pour tout ce qui bloque — mais il ne remplace pas ton passage à l'action.</p></div></div>
+</section>
+
+<script>
+// NAV
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// CHECKS
+const weekCounts = {1:17, 2:12, 3:10, 4:11};
+function ck(el, key) {
+  el.classList.toggle('done');
+  localStorage.setItem('pp_'+key, el.classList.contains('done') ? '1' : '0');
+  updateProgress();
+}
+function resetW(w, count) {
+  for (let i=0;i<count;i++) localStorage.removeItem('pp_'+w+'_'+i);
+  document.querySelectorAll('#s'+w+' .checklist li').forEach(li => li.classList.remove('done'));
+  updateProgress();
+}
+function loadChecks() {
+  document.querySelectorAll('.checklist li[onclick]').forEach(li => {
+    const m = li.getAttribute('onclick').match(/ck\(this,'(.+?)'\)/);
+    if (m && localStorage.getItem('pp_'+m[1]) === '1') li.classList.add('done');
+  });
+  updateProgress();
+}
+function updateProgress() {
+  [1,2,3,4].forEach(w => {
+    const total = weekCounts[w];
+    let done = 0;
+    for (let i=0;i<total;i++) if (localStorage.getItem('pp_'+w+'_'+i)==='1') done++;
+    const pct = Math.round(done/total*100)+'%';
+    ['','b'].forEach(s => {
+      const bar=document.getElementById('p'+w+s+'-bar');
+      const lbl=document.getElementById('p'+w+s+'-pct');
+      if(bar) bar.style.width=pct;
+      if(lbl) lbl.textContent=pct;
+    });
+  });
+}
+
+// ACCORDION
+function toggleObj(el) { el.classList.toggle('open'); }
+
+// FORK
+function selectFork(id, card) {
+  const parent = card.closest('.section, .fork').parentElement;
+  parent.querySelectorAll('.fork-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  const prefix = id.split('-')[0]+'-'+id.split('-')[1];
+  parent.querySelectorAll('.fork-content').forEach(c => c.classList.remove('active'));
+  const target = document.getElementById('fork-'+id);
+  if(target) target.classList.add('active');
+}
+
+// COPY PROMPT
+function copyPrompt(btn) {
+  const text = btn.parentElement.querySelector('p').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copié';
+    setTimeout(() => btn.textContent = 'Copier', 2000);
+  });
+}
+
+window.addEventListener('load', loadChecks);
+</script>
+</body>
+</html>
