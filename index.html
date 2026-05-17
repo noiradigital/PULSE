@@ -198,7 +198,7 @@ async function sendMagicLink() {
 
   const { error } = await _sb.auth.signInWithOtp({
     email,
-    options: { shouldCreateUser: false }
+    options: { shouldCreateUser: true }
   });
 
   btn.disabled = false;
